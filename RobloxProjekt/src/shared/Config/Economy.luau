@@ -1,0 +1,5 @@
+return {
+	OFFLINE_MAX_SECONDS = 8 * 3600,
+	OFFLINE_RATE = 0.5,
+	STORAGE_MAX = 100,
+}

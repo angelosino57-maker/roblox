@@ -1,0 +1,311 @@
+{
+ "roots": [
+  "ReplicatedStorage.Shared",
+  "ServerScriptService.Server",
+  "ServerScriptService.Vendor",
+  "StarterPlayer.StarterPlayerScripts.Client",
+  "ServerStorage.Tests"
+ ],
+ "scripts": [
+  {
+   "file": "src/shared/BaseLayout.luau",
+   "parent": "ReplicatedStorage.Shared",
+   "name": "BaseLayout",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "src/shared/Cloud.luau",
+   "parent": "ReplicatedStorage.Shared",
+   "name": "Cloud",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "src/shared/Config/Cloud.luau",
+   "parent": "ReplicatedStorage.Shared.Config",
+   "name": "Cloud",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "src/shared/Config/Economy.luau",
+   "parent": "ReplicatedStorage.Shared.Config",
+   "name": "Economy",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "src/shared/Config/Mutations.luau",
+   "parent": "ReplicatedStorage.Shared.Config",
+   "name": "Mutations",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "src/shared/Config/Rarity.luau",
+   "parent": "ReplicatedStorage.Shared.Config",
+   "name": "Rarity",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "src/shared/Config/Sounds.luau",
+   "parent": "ReplicatedStorage.Shared.Config",
+   "name": "Sounds",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "src/shared/Config/Species.luau",
+   "parent": "ReplicatedStorage.Shared.Config",
+   "name": "Species",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "src/shared/CreatureModel.luau",
+   "parent": "ReplicatedStorage.Shared",
+   "name": "CreatureModel",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "src/shared/Fomo.luau",
+   "parent": "ReplicatedStorage.Shared",
+   "name": "Fomo",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "src/shared/Format.luau",
+   "parent": "ReplicatedStorage.Shared",
+   "name": "Format",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "src/shared/Loot.luau",
+   "parent": "ReplicatedStorage.Shared",
+   "name": "Loot",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "src/shared/Migrate.luau",
+   "parent": "ReplicatedStorage.Shared",
+   "name": "Migrate",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "src/shared/Remotes.luau",
+   "parent": "ReplicatedStorage.Shared",
+   "name": "Remotes",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "src/shared/Tutorial.luau",
+   "parent": "ReplicatedStorage.Shared",
+   "name": "Tutorial",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "src/server/Main.server.luau",
+   "parent": "ServerScriptService.Server",
+   "name": "Main",
+   "className": "Script"
+  },
+  {
+   "file": "src/server/ProfileTemplate.luau",
+   "parent": "ServerScriptService.Server",
+   "name": "ProfileTemplate",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "src/server/RateLimiter.luau",
+   "parent": "ServerScriptService.Server",
+   "name": "RateLimiter",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "src/server/RemoteHandler.luau",
+   "parent": "ServerScriptService.Server",
+   "name": "RemoteHandler",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "src/server/Services/CloudService.luau",
+   "parent": "ServerScriptService.Server.Services",
+   "name": "CloudService",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "src/server/Services/CreatureService.luau",
+   "parent": "ServerScriptService.Server.Services",
+   "name": "CreatureService",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "src/server/Services/DataService.luau",
+   "parent": "ServerScriptService.Server.Services",
+   "name": "DataService",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "src/server/Services/FomoService.luau",
+   "parent": "ServerScriptService.Server.Services",
+   "name": "FomoService",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "src/server/Services/KingService.luau",
+   "parent": "ServerScriptService.Server.Services",
+   "name": "KingService",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "src/server/Services/PlotService.luau",
+   "parent": "ServerScriptService.Server.Services",
+   "name": "PlotService",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "src/server/Services/StateService.luau",
+   "parent": "ServerScriptService.Server.Services",
+   "name": "StateService",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "src/server/WorldBuilder.luau",
+   "parent": "ServerScriptService.Server",
+   "name": "WorldBuilder",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "src/vendor/ProfileStore.luau",
+   "parent": "ServerScriptService.Vendor",
+   "name": "ProfileStore",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "src/client/ClientState.luau",
+   "parent": "StarterPlayer.StarterPlayerScripts.Client",
+   "name": "ClientState",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "src/client/Controllers/CreatureMotion.luau",
+   "parent": "StarterPlayer.StarterPlayerScripts.Client.Controllers",
+   "name": "CreatureMotion",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "src/client/Controllers/EffectsController.luau",
+   "parent": "StarterPlayer.StarterPlayerScripts.Client.Controllers",
+   "name": "EffectsController",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "src/client/Main.client.luau",
+   "parent": "StarterPlayer.StarterPlayerScripts.Client",
+   "name": "Main",
+   "className": "LocalScript"
+  },
+  {
+   "file": "src/client/Sfx.luau",
+   "parent": "StarterPlayer.StarterPlayerScripts.Client",
+   "name": "Sfx",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "src/client/UI/CreaturePanel.luau",
+   "parent": "StarterPlayer.StarterPlayerScripts.Client.UI",
+   "name": "CreaturePanel",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "src/client/UI/DropCard.luau",
+   "parent": "StarterPlayer.StarterPlayerScripts.Client.UI",
+   "name": "DropCard",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "src/client/UI/FomoWidget.luau",
+   "parent": "StarterPlayer.StarterPlayerScripts.Client.UI",
+   "name": "FomoWidget",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "src/client/UI/HelpPanel.luau",
+   "parent": "StarterPlayer.StarterPlayerScripts.Client.UI",
+   "name": "HelpPanel",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "src/client/UI/Hud.luau",
+   "parent": "StarterPlayer.StarterPlayerScripts.Client.UI",
+   "name": "Hud",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "src/client/UI/Widgets.luau",
+   "parent": "StarterPlayer.StarterPlayerScripts.Client.UI",
+   "name": "Widgets",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "tests/BaseLayout.spec.luau",
+   "parent": "ServerStorage.Tests",
+   "name": "BaseLayout.spec",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "tests/Cloud.spec.luau",
+   "parent": "ServerStorage.Tests",
+   "name": "Cloud.spec",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "tests/Expect.luau",
+   "parent": "ServerStorage.Tests",
+   "name": "Expect",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "tests/Fomo.spec.luau",
+   "parent": "ServerStorage.Tests",
+   "name": "Fomo.spec",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "tests/Format.spec.luau",
+   "parent": "ServerStorage.Tests",
+   "name": "Format.spec",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "tests/Loot.spec.luau",
+   "parent": "ServerStorage.Tests",
+   "name": "Loot.spec",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "tests/Migrate.spec.luau",
+   "parent": "ServerStorage.Tests",
+   "name": "Migrate.spec",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "tests/RateLimiter.spec.luau",
+   "parent": "ServerStorage.Tests",
+   "name": "RateLimiter.spec",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "tests/Smoke.spec.luau",
+   "parent": "ServerStorage.Tests",
+   "name": "Smoke.spec",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "tests/TestRunner.luau",
+   "parent": "ServerStorage.Tests",
+   "name": "TestRunner",
+   "className": "ModuleScript"
+  },
+  {
+   "file": "tests/Tutorial.spec.luau",
+   "parent": "ServerStorage.Tests",
+   "name": "Tutorial.spec",
+   "className": "ModuleScript"
+  }
+ ]
+}
