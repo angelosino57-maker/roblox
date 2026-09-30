@@ -66,4 +66,21 @@ return {
 		Expect.eq(Cloud.autoSells({ rarity = "Selten" }), false)
 		Expect.eq(Cloud.capacity(), 8)
 	end },
+	{ "reveal builds longer suspense for rarer drops and forms", function()
+		Expect.eq(Cloud.revealSeconds({ rarity = "Gewöhnlich" }), 0.4)
+		local last = 0
+		for _, rarity in { "Gewöhnlich", "Ungewöhnlich", "Selten", "Episch", "Legendär", "Mythisch", "Geheim" } do
+			local seconds = Cloud.revealSeconds({ rarity = rarity })
+			Expect.truthy(seconds > last, rarity .. " dauert länger")
+			last = seconds
+		end
+		Expect.near(Cloud.revealSeconds({ rarity = "Selten", mutation = "gold" }), 1.6, 1e-9)
+	end },
+	{ "fast choices do not skip the speed interval", function()
+		-- Drop bei 0 mit Intervall 6 → fällig bei 6; Entscheidung bei 2 → trotzdem erst bei 6
+		Expect.eq(Cloud.nextDropAfterChoice(6, 2), 6)
+		-- Intervall schon abgelaufen → kurze Pause nach der Entscheidung
+		Expect.near(Cloud.nextDropAfterChoice(6, 9), 9.6, 1e-9)
+		Expect.near(Cloud.nextDropAfterChoice(nil, 3), 3.6, 1e-9)
+	end },
 }

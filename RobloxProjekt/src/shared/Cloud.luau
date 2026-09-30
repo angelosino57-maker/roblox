@@ -77,6 +77,17 @@ function Cloud.roll(rng: Random, luck: number, formBoost: number?)
 	return { species = pool[rng:NextInteger(1, #pool)], rarity = rarity, mutation = mutation }
 end
 
+-- Wie lange die Wolke vor der Enthüllung Spannung aufbaut (seltener = länger).
+function Cloud.revealSeconds(creature): number
+	return Config.reveal[creature.rarity] + (if creature.mutation then Config.REVEAL_FORM_BONUS else 0)
+end
+
+-- Nächster Drop nach einer Entscheidung: Das Tempo-Intervall seit dem letzten Drop gilt weiter,
+-- schnelles Entscheiden überspringt es nicht. Nur eine kurze Pause kommt mindestens dazu.
+function Cloud.nextDropAfterChoice(due: number?, now: number): number
+	return math.max(due or now, now + Config.CHOICE_PAUSE)
+end
+
 -- Auto-Farm verkauft gewöhnliche Drops selbst; gute (Selten+ oder mit Form) muss der Spieler holen.
 function Cloud.autoSells(creature): boolean
 	return creature.mutation == nil and Rarity.index(creature.rarity) < Rarity.index(Config.AUTO_WAIT_FROM)

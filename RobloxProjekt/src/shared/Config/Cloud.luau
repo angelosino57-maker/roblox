@@ -25,8 +25,20 @@ return {
 	BAG_MAX = 5, -- Rucksack: mehr Brainrots kann man nicht haben (3 + 5) – echte Entscheidungen!
 	DECIDE_SECONDS = 10, -- so lange liegt ein Drop, dann fliegt er davon
 	AUTO_DECIDE_SECONDS = 20, -- seltene Drops der Auto-Farm warten etwas länger
+	-- Spannung vor der Enthüllung: Die Wolke grummelt und blitzt, je seltener, desto länger (Sekunden).
+	reveal = {
+		["Gewöhnlich"] = 0.4,
+		["Ungewöhnlich"] = 0.6,
+		["Selten"] = 1,
+		["Episch"] = 1.4,
+		["Legendär"] = 2,
+		["Mythisch"] = 2.6,
+		["Geheim"] = 3.4,
+	},
+	REVEAL_FORM_BONUS = 0.6, -- Formen bauen noch etwas länger Spannung auf
 	BASE_INTERVAL = 6, -- Sekunden zwischen Drops beim Knien
 	MIN_INTERVAL = 1,
+	CHOICE_PAUSE = 0.6, -- mindestens so lange nach einer Entscheidung bis zum nächsten Drop
 	AUTO_SLOWER = 2, -- Auto-Farm droppt halb so schnell
 	AUTO_WAIT_FROM = "Selten", -- Auto-Farm verkauft alles darunter; ab hier (oder mit Form) musst DU entscheiden
 	KING_LUCK = 1.5,

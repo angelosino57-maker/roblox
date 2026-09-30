@@ -1,7 +1,8 @@
 -- Die Brainrot-Wolke: Wer vor seiner Wolke kniet (auf dem Kissen sitzt), bekommt Drops.
--- Jeder Drop fällt sichtbar herunter; der Spieler entscheidet mit Countdown BEHALTEN oder SKIPPEN (Geld).
--- Wer zu lange wartet, verliert den Brainrot. Platz ist knapp (3 Podeste + 5 Rucksack): wer voll ist,
--- muss einen ersetzen. Die Auto-Farm verkauft nur Gewöhnliches selbst – gute Drops warten auf den Spieler.
+-- Erst baut die Wolke Spannung auf (seltener = länger), dann fällt der Brainrot sichtbar herunter und der
+-- Spieler entscheidet mit Countdown BEHALTEN oder SKIPPEN (Geld). Wer zu lange wartet, sieht ihn davonfliegen.
+-- Platz ist knapp (3 Podeste + 5 Rucksack): wer voll ist, muss einen ersetzen.
+-- Die Auto-Farm verkauft nur Gewöhnliches selbst – gute Drops warten auf den Spieler.
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -11,6 +12,7 @@ local TweenService = game:GetService("TweenService")
 local Shared = ReplicatedStorage.Shared
 local Cloud = require(Shared.Cloud)
 local CreatureModel = require(Shared.CreatureModel)
+local Format = require(Shared.Format)
 local BaseLayout = require(Shared.BaseLayout)
 local Species = require(Shared.Config.Species)
 local Rarity = require(Shared.Config.Rarity)
@@ -26,9 +28,11 @@ local FomoService = require(script.Parent.FomoService)
 local CloudService = {}
 
 local rng = Random.new()
-local pending = {} -- [player] = {creature, model, expiresAt}
+local pending = {} -- [player] = {creature, model?, revealAt, expiresAt} (model erst nach der Enthüllung)
 local nextDropAt = {} -- [player] = os.clock()
 local kingBonus = {} -- [player] = Glücks-Faktor (König)
+
+local REVEAL_TOLERANCE = 0.25 -- Uhren von Client und Server laufen nie ganz gleich
 
 local REASONS = {
 	coins = "Nicht genug Geld.",
@@ -80,6 +84,24 @@ local function dropVisual(plot, creature): Model
 	return model
 end
 
+-- Countdown abgelaufen: Der Brainrot dreht sich, schrumpft und fliegt zurück in den Himmel.
+local function flyAway(model: Model)
+	local start = model:GetPivot()
+	local scale = model:GetScale()
+	local alpha = Instance.new("NumberValue")
+	alpha.Changed:Connect(function(a)
+		if model.Parent then
+			model:ScaleTo(scale * (1 - 0.8 * a))
+			model:PivotTo(start * CFrame.new(0, a * 45, 0) * CFrame.Angles(0, a * math.pi * 6, 0))
+		end
+	end)
+	TweenService:Create(alpha, TweenInfo.new(1.6, Enum.EasingStyle.Quad, Enum.EasingDirection.In), { Value = 1 }):Play()
+	task.delay(1.7, function()
+		alpha:Destroy()
+		model:Destroy()
+	end)
+end
+
 local function newCreature(rolled)
 	return { id = HttpService:GenerateGUID(false), species = rolled.species, rarity = rolled.rarity, mutation = rolled.mutation }
 end
@@ -122,13 +144,30 @@ local function skip(player: Player, data, creature, position: Vector3)
 	Remotes.CoinBurst:FireClient(player, amount, position, "bag")
 end
 
+-- Nach der Spannung: Der Brainrot fällt aus der Wolke, besondere werden serverweit angesagt. Nur einmal pro Drop.
+local function land(player: Player, p)
+	if p.model or p.plot.folder.Parent == nil then
+		return
+	end
+	local creature = p.creature
+	p.model = dropVisual(p.plot, creature)
+	if isSpecial(creature) then
+		announce("☁️ " .. player.DisplayName .. " hat " .. Species.displayName(creature) .. " (" .. creature.rarity .. ") aus der Wolke gezogen!")
+	end
+	if p.auto then
+		StateService.notify(player, "⏳ Ein " .. creature.rarity .. "-Drop wartet an deiner Wolke – " .. p.seconds .. " Sekunden!")
+	end
+end
+
 local function finish(player: Player, action: string, replaceId): (boolean, string?)
 	local p = pending[player]
 	local data = DataService.get(player)
 	if p == nil or data == nil then
 		return false, "invalid args"
 	end
-	local position = p.model.PrimaryPart.Position
+	if p.model == nil and action ~= "lost" then
+		return false, "reveal" -- noch nicht gelandet
+	end
 	if action == "keep" then
 		local ok, reason = keep(player, data, p.creature, replaceId)
 		if not ok then
@@ -136,14 +175,18 @@ local function finish(player: Player, action: string, replaceId): (boolean, stri
 		end
 		StateService.notify(player, "✅ " .. Species.displayName(p.creature) .. " behalten!")
 	elseif action == "skip" then
-		skip(player, data, p.creature, position)
-	else -- "lost": Countdown abgelaufen
-		StateService.notify(player, "💨 " .. Species.displayName(p.creature) .. " ist davongeflogen …")
+		skip(player, data, p.creature, p.model.PrimaryPart.Position)
+	else -- "lost": Countdown abgelaufen – zeigen, was man verpasst hat
+		StateService.notify(player, "💨 " .. Species.displayName(p.creature) .. " ist davongeflogen … das wären +" .. Format.short(Cloud.income(p.creature)) .. "/s gewesen!")
 	end
 	pending[player] = nil
-	p.model:Destroy()
+	if p.model and action == "lost" then
+		flyAway(p.model)
+	elseif p.model then
+		p.model:Destroy()
+	end
 	Remotes.DropOffer:FireClient(player, nil)
-	nextDropAt[player] = os.clock() + 0.6
+	nextDropAt[player] = Cloud.nextDropAfterChoice(nextDropAt[player], os.clock())
 	StateService.push(player)
 	return true
 end
@@ -151,6 +194,13 @@ end
 function CloudService.choose(player: Player, action, replaceId): (boolean, string?)
 	if action ~= "keep" and action ~= "skip" then
 		return false, "invalid args"
+	end
+	local p = pending[player]
+	if p and os.clock() < p.revealAt - REVEAL_TOLERANCE then
+		return false, "reveal" -- Die Wolke baut noch Spannung auf
+	end
+	if p then
+		land(player, p) -- Client war ein paar Millisekunden schneller als der Server-Takt
 	end
 	return finish(player, action, replaceId)
 end
@@ -164,12 +214,9 @@ function CloudService.drop(player: Player, auto: boolean)
 	local luck = Cloud.luck(data, (kingBonus[player] or 1) * FomoService.luck())
 	local creature = newCreature(Cloud.roll(rng, luck, FomoService.formBoost()))
 	data.stats.drops += 1
-	local model = dropVisual(plot, creature)
-	if isSpecial(creature) or creature.rarity == "Geheim" then
-		announce("☁️ " .. player.DisplayName .. " hat " .. Species.displayName(creature) .. " (" .. creature.rarity .. ") aus der Wolke gezogen!")
-	end
 	if auto and Cloud.autoSells(creature) then
 		-- Auto-Farm: Gewöhnliches wird sofort zu Geld
+		local model = dropVisual(plot, creature)
 		task.delay(0.9, function()
 			if model.Parent then
 				local position = model.PrimaryPart.Position
@@ -179,13 +226,19 @@ function CloudService.drop(player: Player, auto: boolean)
 		end)
 		return
 	end
-	-- Guter Drop (oder Knien): Countdown läuft – entscheiden, sonst fliegt er davon.
+	-- Guter Drop (oder Knien): Erst Spannung (Karte zeigt „???“), dann fällt er und der Countdown läuft.
+	local reveal = Cloud.revealSeconds(creature)
 	local seconds = if auto then CloudConfig.AUTO_DECIDE_SECONDS else CloudConfig.DECIDE_SECONDS
-	pending[player] = { creature = creature, model = model, expiresAt = os.clock() + seconds }
-	Remotes.DropOffer:FireClient(player, creature, Cloud.skipValue(creature) * FomoService.money(), workspace:GetServerTimeNow() + seconds)
-	if auto then
-		StateService.notify(player, "⏳ Ein " .. creature.rarity .. "-Drop wartet an deiner Wolke – " .. seconds .. " Sekunden!")
-	end
+	local now = os.clock()
+	local p = { creature = creature, plot = plot, auto = auto, seconds = seconds, revealAt = now + reveal, expiresAt = now + reveal + seconds }
+	pending[player] = p
+	local serverNow = workspace:GetServerTimeNow()
+	Remotes.DropOffer:FireClient(player, creature, Cloud.skipValue(creature) * FomoService.money(), serverNow + reveal + seconds, serverNow + reveal)
+	task.delay(reveal, function()
+		if pending[player] == p then
+			land(player, p)
+		end
+	end)
 end
 
 ---------------------------------------------------------------- Upgrades
@@ -265,7 +318,7 @@ function CloudService.start()
 	end)
 	DataService.onRemoving(function(player)
 		local p = pending[player]
-		if p then
+		if p and p.model then
 			p.model:Destroy()
 		end
 		pending[player] = nil
